@@ -2,7 +2,7 @@
 //init
 const discord = require("discord.js");
 const bot = new discord.Client();
-const tok = "NjU0MDMxMzQzNDYxNzI4MjU3.Xfp3JQ.1d9qWKqqnN7Ol36p6gf1d_eqEwE"; 
+const tok = "NjU0MDMxMzQzNDYxNzI4MjU3.Xfp4Pw.buCRZYrKnyBHUxg10fkJUr7kcFg"; 
 const guild = bot.guilds.get("654070377021964288");
 version = "2.0.1"
 bot.on("ready", function () {
