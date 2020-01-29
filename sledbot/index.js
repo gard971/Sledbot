@@ -2,7 +2,7 @@
 //init
 const discord = require("discord.js");
 const bot = new discord.Client();
-const tok = "NjU0MDMxMzQzNDYxNzI4MjU3.Xfp5Vg.9mtkU5ekuIOlqOXHSY1tsdnHOw4"; 
+const tok = "NjU0MDMxMzQzNDYxNzI4MjU3.Xg90NQ.zVV2zuJatQPH-1tqNj-pSYR1llA"; 
 const guild = bot.guilds.get("654070377021964288");
 version = "2.0.1"
 bot.on("ready", function () {
@@ -44,13 +44,15 @@ bot.on("message", msg => {
                 .addField("!forslag", "Lag ett forslag..")
                 .addField("!nyDato [dag]", "foreslå en dag å mekke på")
                 .setColor(0xE54827)
+                .setFooter("Sledbot laget av Gard");
             msg.channel.send(embed1)
 
             break;
-        case "clear":
+        case "c":
 
             if (args[1] && msg.member.hasPermission("MANAGE_MESSAGES")) {
-                msg.channel.bulkDelete(args[1])
+                let messages = +args[1] + 1
+                msg.channel.bulkDelete(messages)
             }
             else {
                 return msg.reply("Oisan, her gikk det galt. det kan være har du ikke spesifisert hvor mange meldinger jeg skal slette, det kan også være at du ikke har tilgang til denne komandoen")
@@ -67,7 +69,8 @@ bot.on("message", msg => {
                 const embed4 = new discord.RichEmbed()
                     .setTitle("Info")
                     .setDescription("Yo, eg e sledbot. eg e her for å hjelpe til å organsiere byggingen av trallen. Hvis du trenger hjelp med noe er det bare å spørre(!hjelp). Hvis eg isje svarer e d fordi jeg ikke er skrudd på.")
-                    .setColor(0xE54827);
+                    .setColor(0xE54827)
+                    .setFooter("Sledbot laget av Gard");
                 const channel = bot.channels.get("654078491255635970");
                 msg.delete
                 channel.send(embed4);
@@ -99,7 +102,8 @@ bot.on("message", msg => {
                 const embed2 = new discord.RichEmbed()
                     .setTitle("Forslag av " + msg.author.tag)
                     .setDescription(forslag)
-                    .setColor(0xE54827);
+                    .setColor(0xE54827)
+                    .setFooter("Sledbot laget av Gard");
                 msg.delete()
                 channel = bot.channels.get("654256566228353024")
                 channel.send(embed2).then(message => {
@@ -122,7 +126,8 @@ bot.on("message", msg => {
                 const embed3 = new discord.RichEmbed()
                     .setTitle(args[1])
                     .setDescription("@here Hvis du kan du på " + args[1] + " reager med ✅ hvis ikke reager med ❌")
-                    .setColor(0xE54827);
+                    .setColor(0xE54827)
+                    .setFooter("Sledbot laget av Gard");
                 channel.send("@here")
                 channel.send(embed3).then(message => {
                     message.react("✅")
@@ -131,16 +136,16 @@ bot.on("message", msg => {
             }
             break;
         case "shutdown":
-            if (msg == "!shutdown" && message.member.hasPermission("ADMINISTRATOR")) {
+            if (message.member.hasPermission("ADMINISTRATOR")) {
                 msg.delete()
                 msg.channel.send("bot shutting down, bye!")
-                console.log(msg.author + "sucesfully gave the shutdown command, shutting down")
-                bot.channels.get("654085121309147156").send("sledbot offline:((")
+                console.log(msg.author.tag + " sucesfully gave the shutdown command, shutting down")
+                msg.channel.send("sledbot offline:((")
                 bot.destroy()
             }
             else {
                 msg.reply("You dont have permission to do that")
-                console.log(msg.author + "Just failed to shutdown the bot")
+                console.log(msg.author.tag + " just failed to shutdown the bot")
             }
             break;
         case "mute":
@@ -183,8 +188,11 @@ bot.on("message", msg => {
                 msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:ADDROLE.UNDEFINED")
                 console.log("ERROR: ERR:ADDROLE.UNDEFINED  Full bot crash prevented ")
             }
+            else if(!role2){
+                msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:ADDROLE.CATCH")
+            }
             else {
-                name.addRole(role2).catch(console.error, ()=> msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:ADDROLE.CATCH"))
+                name.addRole(role2).catch(console.error, () => msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:ADDROLE.CATCH"))
             }
             break;
         case "removeRole":
@@ -205,6 +213,19 @@ bot.on("message", msg => {
                 name2.removeRole(role).catch(console.error, () => msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:REMROLE.CATCH"))
             }
             break;
+        case "say":
+           
+            
+                let say =  args.splice(1).join(" ");
+                let embed5 = new discord.RichEmbed()
+                .setTitle("melding fra "+msg.author.tag)
+                .setDescription(say)
+                .setColor(0xE54827)
+                .setThumbnail(msg.author.avatarURL)
+                .setFooter("Sledbot laget av Gard");
+                msg.delete();
+                msg.channel.send(embed5);
+            
     }
  
     if (msg == "gard er dum") {
