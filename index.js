@@ -1,63 +1,221 @@
-//Dokmentasjon: https://docs.google.com/document/d/1PW9q78ukt2aJ2pXWEITplwMDBDKTjlrWIEwwGWy0LYY/edit
-//Instillinger:
-var encryptedPassword = "202cb962ac59075b964b07152d234b70" //endre den lange linjen etter = med ditt nye krypterte passord. husk å inkludere ""
-var userName = "Gard" //lag brukernavn her husk å inkluder ""
-var port = 3000; //endre Port her. Ikke rør hvis du ikke vet hva det er
 
-//IKKE ENDRE NOE UNDER DENNE LINJEN!!
-//Krav til koden
-const app = require("express")();
-const http = require("http").createServer(app)
-const io = require("socket.io")(http)
-const express  = require("express")
-const path = require("path")
-var approvedKeys = []
-var currentUsers = 0
-
-//Hoved kode
-app.use(express.static(path.join(__dirname, '/public')));
-http.listen(port, function(){
-    console.log("Server listening on port " +port)
-});
-io.on("connection", function(socket){
-    currentUsers++
-    console.log("current users: "+ currentUsers)
-socket.on("disconnect", function(){
-    currentUsers = currentUsers -1
-    console.log("curent users: "+ currentUsers)
+//init
+const discord = require("discord.js");
+const bot = new discord.Client();
+const tok = "NjU0MDMxMzQzNDYxNzI4MjU3.Xfp5Vg.9mtkU5ekuIOlqOXHSY1tsdnHOw4"; 
+const guild = bot.guilds.get("654070377021964288");
+version = "2.0.1"
+bot.on("ready", function () {
+  console.log("sledbot online!")
 })
-socket.on("loginReq", function(usernameFromReq, passwordFromReq, id){
-    var encryptedPasswordFromReq = MD5(passwordFromReq)
+bot.login(tok)
+prefix = "!"
+//commands
+bot.on("message", msg => {
+    message = msg
+    
+    args = msg.content.substring(prefix.length).split(" ");
 
-      if(usernameFromReq == userName && encryptedPasswordFromReq == encryptedPassword){
-        var newKey = Math.random()
-        approvedKeys.push(newKey)
-        socket.emit("usernameCorrect", newKey, id, remember = false)
-         }
-   
-    else{
-        socket.emit("usernameWrong")
+
+    switch (args[0]) {
+        case "ping":
+            msg.channel.send("pong!")
+            break;
+
+
+        case "nettside":
+            msg.channel.send("https://gard971.github.io/")
+            break;
+
+
+
+
+
+        case "hjelp":
+            const embed1 = new discord.RichEmbed()
+                .setTitle("Komandoer")
+                .addField("!ping", "pong")
+                .addField("!nettside", "link til Gard sin nettside")
+                .addField("!info", "for info..")
+                .addField("!hjelp", "du ser på den")
+                .addField("!clear", "admin komando. Hvis du ikke vet hva det er ikke bruk den")
+                .addField("!dokument", "Snarvei til hoveddokumentet")
+                .addField("!legtill", "Legg til et dokument i dokumentlisten")
+                .addField("!forslag", "Lag ett forslag..")
+                .addField("!nyDato [dag]", "foreslå en dag å mekke på")
+                .setColor(0xE54827)
+            msg.channel.send(embed1)
+
+            break;
+        case "clear":
+
+            if (args[1] && msg.member.hasPermission("MANAGE_MESSAGES")) {
+                msg.channel.bulkDelete(args[1])
+            }
+            else {
+                return msg.reply("Oisan, her gikk det galt. det kan være har du ikke spesifisert hvor mange meldinger jeg skal slette, det kan også være at du ikke har tilgang til denne komandoen")
+
+            }
+
+            break;
+
+        case "dokument":
+            msg.channel.send("https://docs.google.com/document/d/1hFw6lMZwfKjWLABa1UHLDOFx--Vd1VnQ0mU6gP_7lNM/edit?usp=sharing")
+            break;
+        case "info":
+            if (msg.member.hasPermission("ADMINISTRATOR")) {
+                const embed4 = new discord.RichEmbed()
+                    .setTitle("Info")
+                    .setDescription("Yo, eg e sledbot. eg e her for å hjelpe til å organsiere byggingen av trallen. Hvis du trenger hjelp med noe er det bare å spørre(!hjelp). Hvis eg isje svarer e d fordi jeg ikke er skrudd på.")
+                    .setColor(0xE54827);
+                const channel = bot.channels.get("654078491255635970");
+                msg.delete
+                channel.send(embed4);
+            }
+            else {
+                msg.reply("Du har ikke tilgang til denne komandoen")
+            }
+            break;
+
+        case "legtill":
+            if (!args[1]) {
+                msg.reply("Venligst legg til en link")
+            }
+
+            else {
+                msg.delete()
+                channel = bot.channels.get("654241482680827904")
+                channel.send("nytt forslag av" + msg.author + ":")
+
+
+
+            }
+        case "forslag":
+            if (!args[1]) {
+                msg.reply("venligst skriv et forslag")
+            }
+            else {
+                var forslag = args.splice(1).join(" ")
+                const embed2 = new discord.RichEmbed()
+                    .setTitle("Forslag av " + msg.author.tag)
+                    .setDescription(forslag)
+                    .setColor(0xE54827);
+                msg.delete()
+                channel = bot.channels.get("654256566228353024")
+                channel.send(embed2).then(message => {
+                    message.react("✅")
+                    message.react("❌")
+                })
+
+
+
+
+            }
+            break;
+        case "nyDato":
+            if (!args[1]) {
+                msg.reply("legg in en dag")
+            }
+            else {
+                const channel = bot.channels.get("654723049517613056");
+                msg.delete();
+                const embed3 = new discord.RichEmbed()
+                    .setTitle(args[1])
+                    .setDescription("@here Hvis du kan du på " + args[1] + " reager med ✅ hvis ikke reager med ❌")
+                    .setColor(0xE54827);
+                channel.send("@here")
+                channel.send(embed3).then(message => {
+                    message.react("✅")
+                    message.react("❌")
+                })
+            }
+            break;
+        case "shutdown":
+            if (msg == "!shutdown" && message.member.hasPermission("ADMINISTRATOR")) {
+                msg.delete()
+                msg.channel.send("bot shutting down, bye!")
+                console.log(msg.author + "sucesfully gave the shutdown command, shutting down")
+                bot.channels.get("654085121309147156").send("sledbot offline:((")
+                bot.destroy()
+            }
+            else {
+                msg.reply("You dont have permission to do that")
+                console.log(msg.author + "Just failed to shutdown the bot")
+            }
+            break;
+        case "mute":
+            if (!msg.member.hasPermission("ADMINISTRATOR")) {
+                msg.reply("Du har ikke tilgang til denne komadoen")
+            }
+            else if (!args[1]) {
+                msg.reply("hvem vil du mute?")
+            }
+            else {
+                let name = message.mentions.members.first();
+                var role = message.guild.roles.find(role => role.name === "muted");
+                name.addRole(role)
+            }
+            break;
+        case "unmute":
+            if (!msg.member.hasPermission("ADMINISTRATOR")) {
+                msg.reply("Du har ikke tilgang til denne komadoen")
+            }
+            else if (!args[1]) {
+                msg.reply("hvem vil du unmute?")
+            }
+            else {
+                console.log("ok")
+                let name = message.mentions.members.first();
+                var role = message.guild.roles.find(role => role.name === "muted");
+                name.removeRole(role)
+            }
+            break;
+        case "addRole":
+            let name = message.mentions.members.first();
+            let role2 = message.guild.roles.find(role => role.name === args[1]);
+            if (!msg.member.hasPermission("ADMINISTRATOR")) {
+                msg.reply("Du har ikke tilgang til denne komadoen")
+            }
+            else if (!args[1] || !args[2]) {
+                msg.reply("Ett eller flere argument mangler")
+            }
+            else if (name == undefined) {
+                msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:ADDROLE.UNDEFINED")
+                console.log("ERROR: ERR:ADDROLE.UNDEFINED  Full bot crash prevented ")
+            }
+            else {
+                name.addRole(role2).catch(console.error, ()=> msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:ADDROLE.CATCH"))
+            }
+            break;
+        case "removeRole":
+             let name2 = message.mentions.members.first();
+             role = message.guild.roles.find(role => role.name === args[1])
+            if (!msg.member.hasPermission("ADMINISTRATOR")) {
+                msg.reply("Du har ikke tilgang til denne komandoen")
+            }
+            else if (!args[1] || !args[2]) {
+                msg.reply("Ett eller flere agumenter mangler")
+            }
+            else if (name2 == undefined) {
+                msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:REMROLE.UNDEFINED")
+                console.log("ERROR: ERR:REMROLE.UNDEFINED  Full bot crash prevented ")
+            }
+            else {
+             
+                name2.removeRole(role).catch(console.error, () => msg.reply("oi, noe gikk galt. kanskje denne rollen ikke eksisterer. Hvis denne rolen eksisterer og du mener noe annet er feil kontakt Gard med feilkoden ERR:REMROLE.CATCH"))
+            }
+            break;
     }
-})
-socket.on("check", function(key, requestId, key2){
-    if(!approvedKeys.includes(+key) && !approvedKeys.includes(+key2)){
-        io.emit("notAllowed", requestId)
+ 
+    if (msg == "gard er dum") {
+        msg.delete()
+        msg.reply("EI, ikke kall gard dum")
     }
-})
-socket.on("removeKey", function(key){
-    if(approvedKeys.includes(+key)){
-    var index = approvedKeys.indexOf(+key)
-    approvedKeys.splice(index, 1)
+    if (msg == "Gard er dum") {
+        msg.delete()
+        msg.reply("EI, ikke kall gard dum")
     }
 
-})
-socket.on("warningNoKey", function(){
-    console.log('\x1b[31m%s\x1b[0m', 'WARNING!!! err_NoKey, a client just logged out witouth a authenticator id beeing deleted. All authenticator keys have automaticly been deleted. If any keys have are logged in the console an imediate server restart is recomended'); 
-    approvedKeys = []
-    console.log(approvedKeys)
-    io.emit("kickOut")
 
 })
-})
-//Kryptering
-var MD5 = function(d){result = M(V(Y(X(d),8*d.length)));return result.toLowerCase()};function M(d){for(var _,m="0123456789ABCDEF",f="",r=0;r<d.length;r++)_=d.charCodeAt(r),f+=m.charAt(_>>>4&15)+m.charAt(15&_);return f}function X(d){for(var _=Array(d.length>>2),m=0;m<_.length;m++)_[m]=0;for(m=0;m<8*d.length;m+=8)_[m>>5]|=(255&d.charCodeAt(m/8))<<m%32;return _}function V(d){for(var _="",m=0;m<32*d.length;m+=8)_+=String.fromCharCode(d[m>>5]>>>m%32&255);return _}function Y(d,_){d[_>>5]|=128<<_%32,d[14+(_+64>>>9<<4)]=_;for(var m=1732584193,f=-271733879,r=-1732584194,i=271733878,n=0;n<d.length;n+=16){var h=m,t=f,g=r,e=i;f=md5_ii(f=md5_ii(f=md5_ii(f=md5_ii(f=md5_hh(f=md5_hh(f=md5_hh(f=md5_hh(f=md5_gg(f=md5_gg(f=md5_gg(f=md5_gg(f=md5_ff(f=md5_ff(f=md5_ff(f=md5_ff(f,r=md5_ff(r,i=md5_ff(i,m=md5_ff(m,f,r,i,d[n+0],7,-680876936),f,r,d[n+1],12,-389564586),m,f,d[n+2],17,606105819),i,m,d[n+3],22,-1044525330),r=md5_ff(r,i=md5_ff(i,m=md5_ff(m,f,r,i,d[n+4],7,-176418897),f,r,d[n+5],12,1200080426),m,f,d[n+6],17,-1473231341),i,m,d[n+7],22,-45705983),r=md5_ff(r,i=md5_ff(i,m=md5_ff(m,f,r,i,d[n+8],7,1770035416),f,r,d[n+9],12,-1958414417),m,f,d[n+10],17,-42063),i,m,d[n+11],22,-1990404162),r=md5_ff(r,i=md5_ff(i,m=md5_ff(m,f,r,i,d[n+12],7,1804603682),f,r,d[n+13],12,-40341101),m,f,d[n+14],17,-1502002290),i,m,d[n+15],22,1236535329),r=md5_gg(r,i=md5_gg(i,m=md5_gg(m,f,r,i,d[n+1],5,-165796510),f,r,d[n+6],9,-1069501632),m,f,d[n+11],14,643717713),i,m,d[n+0],20,-373897302),r=md5_gg(r,i=md5_gg(i,m=md5_gg(m,f,r,i,d[n+5],5,-701558691),f,r,d[n+10],9,38016083),m,f,d[n+15],14,-660478335),i,m,d[n+4],20,-405537848),r=md5_gg(r,i=md5_gg(i,m=md5_gg(m,f,r,i,d[n+9],5,568446438),f,r,d[n+14],9,-1019803690),m,f,d[n+3],14,-187363961),i,m,d[n+8],20,1163531501),r=md5_gg(r,i=md5_gg(i,m=md5_gg(m,f,r,i,d[n+13],5,-1444681467),f,r,d[n+2],9,-51403784),m,f,d[n+7],14,1735328473),i,m,d[n+12],20,-1926607734),r=md5_hh(r,i=md5_hh(i,m=md5_hh(m,f,r,i,d[n+5],4,-378558),f,r,d[n+8],11,-2022574463),m,f,d[n+11],16,1839030562),i,m,d[n+14],23,-35309556),r=md5_hh(r,i=md5_hh(i,m=md5_hh(m,f,r,i,d[n+1],4,-1530992060),f,r,d[n+4],11,1272893353),m,f,d[n+7],16,-155497632),i,m,d[n+10],23,-1094730640),r=md5_hh(r,i=md5_hh(i,m=md5_hh(m,f,r,i,d[n+13],4,681279174),f,r,d[n+0],11,-358537222),m,f,d[n+3],16,-722521979),i,m,d[n+6],23,76029189),r=md5_hh(r,i=md5_hh(i,m=md5_hh(m,f,r,i,d[n+9],4,-640364487),f,r,d[n+12],11,-421815835),m,f,d[n+15],16,530742520),i,m,d[n+2],23,-995338651),r=md5_ii(r,i=md5_ii(i,m=md5_ii(m,f,r,i,d[n+0],6,-198630844),f,r,d[n+7],10,1126891415),m,f,d[n+14],15,-1416354905),i,m,d[n+5],21,-57434055),r=md5_ii(r,i=md5_ii(i,m=md5_ii(m,f,r,i,d[n+12],6,1700485571),f,r,d[n+3],10,-1894986606),m,f,d[n+10],15,-1051523),i,m,d[n+1],21,-2054922799),r=md5_ii(r,i=md5_ii(i,m=md5_ii(m,f,r,i,d[n+8],6,1873313359),f,r,d[n+15],10,-30611744),m,f,d[n+6],15,-1560198380),i,m,d[n+13],21,1309151649),r=md5_ii(r,i=md5_ii(i,m=md5_ii(m,f,r,i,d[n+4],6,-145523070),f,r,d[n+11],10,-1120210379),m,f,d[n+2],15,718787259),i,m,d[n+9],21,-343485551),m=safe_add(m,h),f=safe_add(f,t),r=safe_add(r,g),i=safe_add(i,e)}return Array(m,f,r,i)}function md5_cmn(d,_,m,f,r,i){return safe_add(bit_rol(safe_add(safe_add(_,d),safe_add(f,i)),r),m)}function md5_ff(d,_,m,f,r,i,n){return md5_cmn(_&m|~_&f,d,_,r,i,n)}function md5_gg(d,_,m,f,r,i,n){return md5_cmn(_&f|m&~f,d,_,r,i,n)}function md5_hh(d,_,m,f,r,i,n){return md5_cmn(_^m^f,d,_,r,i,n)}function md5_ii(d,_,m,f,r,i,n){return md5_cmn(m^(_|~f),d,_,r,i,n)}function safe_add(d,_){var m=(65535&d)+(65535&_);return(d>>16)+(_>>16)+(m>>16)<<16|65535&m}function bit_rol(d,_){return d<<_|d>>>32-_}
+
